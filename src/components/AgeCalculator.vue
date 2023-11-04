@@ -1,46 +1,145 @@
 <template>
   <div class="main">
     <div class="container">
-      <div class="form">
-        <form action="#">
+      <form class="date-form">
+        <div>
           <label>DAY</label>
-          <input type="text" placeholder="DD" />
-          <label>MONTH</label>
-          <input type="text" placeholder="MM" />
-          <label>YEAR</label>
-          <input type="text" placeholder="YYYY" />
-        </form>
-        <div class="arrowline">
-          <hr />
-          <button @click="AgeCalculatorapp">
-            <img :src="arrImage" alt="ArrowImage" />
-          </button>
+          <input
+            id="day"
+            type="text"
+            placeholder="DD"
+            v-model="inputDay"
+            @input="errorMessages"
+          />
+          <i class="error" id="day-msg" v-if="errorDayMessage">{{
+            errorDayMessage
+          }}</i>
         </div>
-      </div>
 
+        <div>
+          <label>MONTH</label>
+          <input
+            id="month"
+            type="text"
+            placeholder="MM"
+            v-model="inputMonth"
+            @input="errorMessages"
+          />
+          <i class="error" id="month-msg" v-if="errorMonthMessage">{{
+            errorMonthMessage
+          }}</i>
+        </div>
+
+        <div>
+          <label>YEAR</label>
+          <input
+            id="year"
+            type="text"
+            placeholder="YYYY"
+            v-model="inputYear"
+            @input="errorMessages"
+          />
+          <i class="error" id="year-msg" v-if="errorYearMessage">{{
+            errorYearMessage
+          }}</i>
+        </div>
+      </form>
+      <div class="arrowline">
+        <button @click="calculateAge">
+          <img :src="require('../assets/iconarrow.svg')" alt="ArrowImage" />
+        </button>
+      </div>
       <div class="content">
-        <p class="year"><span>--</span>years</p>
-        <p class="month"><span>--</span>months</p>
-        <p class="days"><span>--</span>days</p>
+        <p>
+          <span>{{ birthYear }}</span
+          >years
+        </p>
+        <p>
+          <span>{{ birthMonth }}</span
+          >months
+        </p>
+        <p>
+          <span>{{ birthDay }}</span
+          >days
+        </p>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import ArrowImage from "../assets/iconarrow.svg";
-export default {
-  data() {
-    return {
-      arrImage: ArrowImage,
-    };
-  },
+<script setup>
+import { ref } from "vue";
+const inputDay = ref("");
+const inputMonth = ref("");
+const inputYear = ref("");
+let birthDay = ref("");
+let birthYear = ref("");
+let birthMonth = ref("");
+/* let errorMessageDay = inputDay.value > 31;
+let errorMessageMonth = inputMonth.value > 12;
+let errorMessageYear = inputYear.value > 2023; */
+let errorDayMessage = ref("");
+let errorMonthMessage = ref("");
+let errorYearMessage = ref("");
+const currentDate = new Date();
+const errorMessages = () => {
+  if (inputDay.value > 31 && inputMonth.value > 12 && inputYear.value > 2023) {
+    errorDayMessage = "Must be a valid day";
+    errorMonthMessage = "Must be a valid Month";
+    errorYearMessage = "Must be in the past";
+  } else if (
+    inputDay.value === "" &&
+    inputMonth.value === "" &&
+    inputYear.value === ""
+  ) {
+    errorDayMessage = "This field is required";
+    errorMonthMessage = "This field is required";
+    errorYearMessage = "This field is required";
+  } else {
+    errorDayMessage = "";
+    errorMonthMessage = "";
+    errorYearMessage = "";
+  }
+};
+const calculateAge = () => {
+  const birthDate = new Date(
+    inputYear.value,
+    inputMonth.value - 1,
+    inputDay.value
+  );
 
-  /* method: {
-    AgeCalculatorApp() {
-      let CurrentDate = new Date();
-    },
-  }, */
+  if (inputDay.value > 31 && inputMonth.value > 12 && inputYear.value > 2023) {
+    birthYear.value = "_ _";
+    birthMonth.value = "_ _";
+    birthDay.value = "_ _";
+    /*  errorDayMessage = "Must be a valid day";
+    errorMonthMessage = "Must be a valid Month";
+    errorYearMessage = "Must be in the past"; */
+  } else if (
+    inputDay.value === "" &&
+    inputMonth.value === "" &&
+    inputYear.value === ""
+  ) {
+    birthYear.value = "_ _";
+    birthMonth.value = "_ _";
+    birthDay.value = "_ _";
+    errorDayMessage = "This field is required";
+    errorMonthMessage = "This field is required";
+    errorYearMessage = "This field is required";
+  } else {
+    // Calculate age and update data properties
+    const ageInMilliseconds = currentDate - birthDate;
+    const ageDate = new Date(ageInMilliseconds);
+    const years = ageDate.getUTCFullYear() - 1970;
+    const months = ageDate.getUTCMonth();
+    const days = ageDate.getUTCDate() - 1;
+    /* errorDayMessage = "";
+    errorMonthMessage = "";
+    errorYearMessage = ""; */
+    birthYear.value = years;
+    birthMonth.value = months;
+    birthDay.value = days;
+  }
 };
 </script>
 
@@ -49,49 +148,62 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 1440px;
+  width: 100%;
   height: 100vh;
   background-color: hsl(0, 0%, 94%);
 }
 
 .container {
-  width: 700px;
-  height: 550px;
-  border-radius: 16px;
+  width: 45%;
+  border-radius: 20px;
   border-bottom-right-radius: 40%;
   background-color: white;
   position: relative;
-  padding: 10px;
-  /* justify-content: center; */
+  padding: 60px;
 }
 
-form {
+.date-form {
   display: flex;
-  text-align: center;
-  /* margin: 30px 30px 0 0; */
+  gap: 30px;
   margin-top: 30px;
+}
+
+.date-form div {
+  display: flex;
+  flex-direction: column;
+}
+
+.content span {
+  color: hsl(259, 100%, 65%);
+  margin-right: 10px;
 }
 
 label {
-  font-family: "Poppins", sans-serif;
   color: hsl(0, 1%, 44%);
+  letter-spacing: 0.2rem;
 }
 
 input {
-  width: 75px;
-  height: 40px;
-  color: hsl(0, 0%, 86%);
-  margin-top: 30px;
+  width: 85px;
   border-radius: 3px;
   border: 1px solid hsl(0, 0%, 86%);
-  padding-left: 10px;
-  font-family: "Poppins", sans-serif;
-  font-style: none;
-  font-size: 20px;
+  font-size: 22px;
+  font-weight: bolder;
+  padding: 6px 8px;
 }
 
 .arrowline {
-  display: flex;
+  position: relative;
+  width: 100%;
+  height: 2px;
+  background: lightgray;
+  margin: 50px auto;
+}
+
+.arrowline button {
+  position: absolute;
+  right: 0;
+  top: -30px;
 }
 
 hr {
@@ -119,54 +231,33 @@ button:hover {
   color: white;
 }
 
-button:focus {
-}
-
 button img {
   width: 30px;
   height: 50px;
-  padding: 8px;
+  padding: 5px;
 }
 
 .content {
-  font-family: "Poppins", sans-serif;
   font-style: italic;
   font-weight: bold;
-  font-size: 85px;
-  margin: 30px;
-  position: absolute;
-  top: 18%;
+
+  /* background-color: blue; */
 }
 
-.container p {
-  margin-bottom: 50px;
-}
-
-span {
+.content p::before {
+  /* content: "---"; */
   color: hsl(259, 100%, 65%);
+  font-size: 30px;
   margin-right: 10px;
 }
-
-.year {
-  position: absolute;
-  bottom: 10px;
-}
-.month {
-  margin-top: 30px;
-  position: relative;
-  top: 70px;
-}
-.days {
-  /* background: red; */
-  width: 100%;
-  margin-bottom: 60px;
-  position: absolute;
-  top: 50%;
+.content p {
+  font-size: 50px;
+  margin: 0;
+  padding: 0;
 }
 
-@media screen and (max-width: 1440px) {
-  .form {
-    zoom: normal;
-  }
+.error {
+  color: hsl(0, 100%, 67%);
+  font-size: 12px;
 }
 </style>
