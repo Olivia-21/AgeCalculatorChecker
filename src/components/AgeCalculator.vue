@@ -3,10 +3,12 @@
     <div class="container">
       <form class="date-form">
         <div>
-          <label>DAY</label>
+          <label class="Error" id="day">DAY</label>
           <input
             id="day"
             type="text"
+            required
+            maxlength="2"
             placeholder="DD"
             v-model="inputDay"
             @input="errorMessages"
@@ -17,10 +19,12 @@
         </div>
 
         <div>
-          <label>MONTH</label>
+          <label class="Error" id="month">MONTH</label>
           <input
             id="month"
             type="text"
+            required
+            maxlength="2"
             placeholder="MM"
             v-model="inputMonth"
             @input="errorMessages"
@@ -31,10 +35,12 @@
         </div>
 
         <div>
-          <label>YEAR</label>
+          <label class="Error" id="year">YEAR</label>
           <input
             id="year"
             type="text"
+            required
+            maxlength="4"
             placeholder="YYYY"
             v-model="inputYear"
             @input="errorMessages"
@@ -69,36 +75,52 @@
 
 <script setup>
 import { ref } from "vue";
-const inputDay = ref("");
-const inputMonth = ref("");
-const inputYear = ref("");
+let inputDay = ref("");
+let inputMonth = ref("");
+let inputYear = ref("");
 let birthDay = ref("");
 let birthYear = ref("");
 let birthMonth = ref("");
-/* let errorMessageDay = inputDay.value > 31;
-let errorMessageMonth = inputMonth.value > 12;
-let errorMessageYear = inputYear.value > 2023; */
 let errorDayMessage = ref("");
 let errorMonthMessage = ref("");
 let errorYearMessage = ref("");
 const currentDate = new Date();
+
 const errorMessages = () => {
   if (inputDay.value > 31 && inputMonth.value > 12 && inputYear.value > 2023) {
     errorDayMessage = "Must be a valid day";
     errorMonthMessage = "Must be a valid Month";
     errorYearMessage = "Must be in the past";
+    document.getElementById("day").style.color = "hsl(0, 100%, 67%)";
+    document.getElementById("month").style.color = "hsl(0, 100%, 67%)";
+    document.getElementById("year").style.color = "hsl(0, 100%, 67%)";
+    const element = document.querySelector("input");
+    for (let i = 0; i < element.length; i++) {
+      element[i].style.border = "1px solid red";
+    }
   } else if (
-    inputDay.value === "" &&
-    inputMonth.value === "" &&
-    inputYear.value === ""
+    inputDay.value >= 31 &&
+    (parseInt(inputMonth.value) === 4 ||
+      parseInt(inputMonth.value) === 6 ||
+      parseInt(inputMonth.value) === 9 ||
+      parseInt(inputMonth.value) === 11)
   ) {
-    errorDayMessage = "This field is required";
-    errorMonthMessage = "This field is required";
-    errorYearMessage = "This field is required";
+    errorDayMessage = "Must be a valid date";
+    document.getElementById("day").style.color = "hsl(0, 100%, 67%)";
   } else {
     errorDayMessage = "";
     errorMonthMessage = "";
     errorYearMessage = "";
+    birthYear.value = "--";
+    birthMonth.value = "--";
+    birthDay.value = "--";
+    document.getElementById("day").style.color = " hsl(0, 1%, 44%)";
+    document.getElementById("month").style.color = " hsl(0, 1%, 44%)";
+    document.getElementById("year").style.color = " hsl(0, 1%, 44%)";
+    const element = document.querySelector("input");
+    for (let i = 0; i < element.length; i++) {
+      element[i].style.border = "none";
+    }
   }
 };
 const calculateAge = () => {
@@ -112,9 +134,17 @@ const calculateAge = () => {
     birthYear.value = "_ _";
     birthMonth.value = "_ _";
     birthDay.value = "_ _";
-    /*  errorDayMessage = "Must be a valid day";
-    errorMonthMessage = "Must be a valid Month";
-    errorYearMessage = "Must be in the past"; */
+  } else if (
+    parseInt(inputDay.value) >= 31 &&
+    (parseInt(inputMonth.value) === 4 ||
+      parseInt(inputMonth.value) === 6 ||
+      parseInt(inputMonth.value) === 9 ||
+      parseInt(inputMonth.value) === 11) &&
+    inputYear.value >= 1970
+  ) {
+    birthYear.value = "_ _";
+    birthMonth.value = "_ _";
+    birthDay.value = "_ _";
   } else if (
     inputDay.value === "" &&
     inputMonth.value === "" &&
@@ -126,6 +156,13 @@ const calculateAge = () => {
     errorDayMessage = "This field is required";
     errorMonthMessage = "This field is required";
     errorYearMessage = "This field is required";
+    document.getElementById("day").style.color = "hsl(0, 100%, 67%)";
+    document.getElementById("month").style.color = "hsl(0, 100%, 67%)";
+    document.getElementById("year").style.color = "hsl(0, 100%, 67%)";
+    const element = document.querySelector("input");
+    for (let i = 0; i < element.length; i++) {
+      element[i].style.border = "1px solid red";
+    }
   } else {
     // Calculate age and update data properties
     const ageInMilliseconds = currentDate - birthDate;
@@ -133,9 +170,6 @@ const calculateAge = () => {
     const years = ageDate.getUTCFullYear() - 1970;
     const months = ageDate.getUTCMonth();
     const days = ageDate.getUTCDate() - 1;
-    /* errorDayMessage = "";
-    errorMonthMessage = "";
-    errorYearMessage = ""; */
     birthYear.value = years;
     birthMonth.value = months;
     birthDay.value = days;
@@ -154,18 +188,20 @@ const calculateAge = () => {
 }
 
 .container {
-  width: 45%;
+  width: 40%;
+  height: 70%;
   border-radius: 20px;
   border-bottom-right-radius: 40%;
   background-color: white;
-  position: relative;
-  padding: 60px;
+  /* position: relative; */
+  padding: 10px 60px;
+  margin-top: 0;
 }
 
 .date-form {
   display: flex;
   gap: 30px;
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
 .date-form div {
@@ -180,7 +216,8 @@ const calculateAge = () => {
 
 label {
   color: hsl(0, 1%, 44%);
-  letter-spacing: 0.2rem;
+  letter-spacing: 0.1rem;
+  font-weight: 0;
 }
 
 input {
@@ -197,23 +234,14 @@ input {
   width: 100%;
   height: 2px;
   background: lightgray;
-  margin: 50px auto;
+  margin-top: 40px;
+  margin-bottom: 30px;
 }
 
 .arrowline button {
   position: absolute;
   right: 0;
   top: -30px;
-}
-
-hr {
-  width: 75%;
-  text-align: center;
-  border: none;
-  border-top: 1px solid lightgray;
-  margin-top: 36px;
-  margin-right: 1px;
-  margin-left: 32px;
 }
 
 button {
@@ -240,8 +268,6 @@ button img {
 .content {
   font-style: italic;
   font-weight: bold;
-
-  /* background-color: blue; */
 }
 
 .content p::before {
@@ -258,6 +284,6 @@ button img {
 
 .error {
   color: hsl(0, 100%, 67%);
-  font-size: 12px;
+  font-size: 14px;
 }
 </style>
