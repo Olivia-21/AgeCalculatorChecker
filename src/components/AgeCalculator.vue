@@ -291,7 +291,6 @@ button img {
   .container {
     width: 90%;
     padding: 10px;
-    background-color: green;
     position: relative;
   }
 
@@ -306,7 +305,6 @@ button img {
   }
 
   .date-form {
-    background-color: red;
     gap: 20px;
     margin: 0;
   }
