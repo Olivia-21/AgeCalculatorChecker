@@ -286,4 +286,29 @@ button img {
   color: hsl(0, 100%, 67%);
   font-size: 14px;
 }
+
+@media screen and (max-width: 600px) {
+  .container {
+    width: 90%;
+    padding: 10px;
+    background-color: green;
+    position: relative;
+  }
+
+  input {
+    width: 60px;
+  }
+
+  .arrowline button {
+    position: absolute;
+    /* top: 40%; */
+    left: 40%;
+  }
+
+  .date-form {
+    background-color: red;
+    gap: 20px;
+    margin: 0;
+  }
+}
 </style>
