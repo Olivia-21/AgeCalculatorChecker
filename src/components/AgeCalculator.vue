@@ -3,56 +3,54 @@
     <div class="container">
       <form class="date-form">
         <div>
-          <label class="Error" id="day">DAY</label>
+          <label :class="dayErr.showErr ? 'error' : ''">DAY</label>
           <input
-            id="day"
             type="text"
             required
             maxlength="2"
             placeholder="DD"
             v-model="inputDay"
             @input="errorMessages"
+            :class="dayErr.showErr ? 'inputError' : ''"
           />
-          <i class="error" id="day-msg" v-if="errorDayMessage">{{
-            errorDayMessage
+          <i class="error" id="day-msg" v-if="dayErr.showErr">{{
+            dayErr.message
           }}</i>
         </div>
 
         <div>
-          <label class="Error" id="month">MONTH</label>
+          <label :class="monthErr.showErr ? 'error' : ''">MONTH</label>
           <input
-            id="month"
             type="text"
             required
             maxlength="2"
             placeholder="MM"
             v-model="inputMonth"
             @input="errorMessages"
+            :class="monthErr.showErr ? 'inputError' : ''"
           />
-          <i class="error" id="month-msg" v-if="errorMonthMessage">{{
-            errorMonthMessage
-          }}</i>
+          <i class="error" v-if="monthErr.showErr">{{ monthErr.message }}</i>
         </div>
 
         <div>
-          <label class="Error" id="year">YEAR</label>
+          <label :class="yearErr.showErr ? 'error' : ''">YEAR</label>
           <input
-            id="year"
             type="text"
             required
             maxlength="4"
             placeholder="YYYY"
             v-model="inputYear"
             @input="errorMessages"
+            :class="monthErr.showErr ? 'inputError' : ''"
           />
-          <i class="error" id="year-msg" v-if="errorYearMessage">{{
-            errorYearMessage
+          <i class="error" id="year-msg" v-if="yearErr.showErr">{{
+            yearErr.message
           }}</i>
         </div>
       </form>
       <div class="arrowline">
         <button @click="calculateAge">
-          <img :src="require('../assets/iconarrow.svg')" alt="ArrowImage" />
+          <img src="../assets/iconarrow.svg" alt="ArrowImage" />
         </button>
       </div>
       <div class="content">
@@ -74,53 +72,51 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, reactive } from "vue";
 let inputDay = ref("");
 let inputMonth = ref("");
 let inputYear = ref("");
 let birthDay = ref("");
 let birthYear = ref("");
 let birthMonth = ref("");
-let errorDayMessage = ref("");
-let errorMonthMessage = ref("");
-let errorYearMessage = ref("");
+
 const currentDate = new Date();
 
+const dayErr = reactive({ message: "", showErr: false });
+const monthErr = reactive({ message: "", showErr: false });
+const yearErr = reactive({ message: "", showErr: false });
+
 const errorMessages = () => {
-  if (inputDay.value > 31 && inputMonth.value > 12 && inputYear.value > 2023) {
-    errorDayMessage = "Must be a valid day";
-    errorMonthMessage = "Must be a valid Month";
-    errorYearMessage = "Must be in the past";
-    document.getElementById("day").style.color = "hsl(0, 100%, 67%)";
-    document.getElementById("month").style.color = "hsl(0, 100%, 67%)";
-    document.getElementById("year").style.color = "hsl(0, 100%, 67%)";
-    const element = document.querySelector("input");
-    for (let i = 0; i < element.length; i++) {
-      element[i].style.border = "1px solid red";
-    }
-  } else if (
+  if (inputDay.value > 31) {
+    dayErr.showErr = true;
+    dayErr.message = "Must be a valid day";
+  } else {
+    dayErr.showErr = false;
+  }
+
+  if (inputMonth.value > 12) {
+    monthErr.message = "Must be a valid Month";
+    monthErr.showErr = true;
+  } else {
+    monthErr.showErr = false;
+  }
+
+  if (inputYear.value > 2023) {
+    yearErr.showErr = true;
+    yearErr.message = "Must be in the past";
+  } else {
+    yearErr.showErr = false;
+  }
+
+  if (
     inputDay.value >= 31 &&
     (parseInt(inputMonth.value) === 4 ||
       parseInt(inputMonth.value) === 6 ||
       parseInt(inputMonth.value) === 9 ||
       parseInt(inputMonth.value) === 11)
   ) {
-    errorDayMessage = "Must be a valid date";
-    document.getElementById("day").style.color = "hsl(0, 100%, 67%)";
-  } else {
-    errorDayMessage = "";
-    errorMonthMessage = "";
-    errorYearMessage = "";
-    birthYear.value = "--";
-    birthMonth.value = "--";
-    birthDay.value = "--";
-    document.getElementById("day").style.color = " hsl(0, 1%, 44%)";
-    document.getElementById("month").style.color = " hsl(0, 1%, 44%)";
-    document.getElementById("year").style.color = " hsl(0, 1%, 44%)";
-    const element = document.querySelector("input");
-    for (let i = 0; i < element.length; i++) {
-      element[i].style.border = "none";
-    }
+    dayErr.showErr = true;
+    dayErr.message = "Must be a valid date";
   }
 };
 const calculateAge = () => {
@@ -129,6 +125,39 @@ const calculateAge = () => {
     inputMonth.value - 1,
     inputDay.value
   );
+
+  if (inputDay.value === "") {
+    dayErr.message = "Enter value for day";
+    dayErr.showErr = true;
+  } else {
+    dayErr.showErr = false;
+  }
+  if (inputMonth.value === "") {
+    monthErr.message = "Enter value for month";
+    monthErr.showErr = true;
+  } else {
+    dayErr.showErr = false;
+  }
+  if (inputYear.value === "") {
+    yearErr.message = "Enter value for year";
+    yearErr.showErr = true;
+  } else {
+    yearErr.showErr = false;
+  }
+
+  if (
+    inputDay.value === inputDay.value &&
+    inputMonth.value === "" &&
+    inputYear.value === inputYear.value
+  ) {
+    monthErr.message = "Enter value for month";
+    monthErr.showErr = true;
+    birthDate.value = "_ _";
+    birthMonth.value = "_ _";
+    birthYear.value = "_ _";
+  } else {
+    monthErr.showErr = false;
+  }
 
   if (inputDay.value > 31 && inputMonth.value > 12 && inputYear.value > 2023) {
     birthYear.value = "_ _";
@@ -153,16 +182,6 @@ const calculateAge = () => {
     birthYear.value = "_ _";
     birthMonth.value = "_ _";
     birthDay.value = "_ _";
-    errorDayMessage = "This field is required";
-    errorMonthMessage = "This field is required";
-    errorYearMessage = "This field is required";
-    document.getElementById("day").style.color = "hsl(0, 100%, 67%)";
-    document.getElementById("month").style.color = "hsl(0, 100%, 67%)";
-    document.getElementById("year").style.color = "hsl(0, 100%, 67%)";
-    const element = document.querySelector("input");
-    for (let i = 0; i < element.length; i++) {
-      element[i].style.border = "1px solid red";
-    }
   } else {
     // Calculate age and update data properties
     const ageInMilliseconds = currentDate - birthDate;
@@ -308,5 +327,9 @@ button img {
     gap: 20px;
     margin: 0;
   }
+}
+
+.inputError {
+  border: 1px solid red;
 }
 </style>
